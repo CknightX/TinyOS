@@ -26,14 +26,33 @@ nop ; 占位
 	; 磁盘头设置好后，Linux就可以识别该磁盘，可以进行挂载等操作
 
 BOOT_START:
-mov ax,cs
-mov ds,ax
-mov es,ax
-call PRT_MSG
-jmp $
+		mov ax,cs
+		mov ds,ax
+		mov es,ax
+		call PRT_MSG ;输出字符串
+
+; 加载LOADER到内存中，这里默认LOADER存放在数据区开始位置
+LOAD_LOADER:
+		mov bx,0100h
+		mov ax,09000h
+		mov es,ax      ; 从磁盘将数据读入es:bx指向的缓冲区中
+		mov ch,0 ; 柱面为0
+		mov dh,1 ; 磁头为1
+		mov cl,17 ; 起始扇区号为17
+
+READ_SECTOR:
+mov ah,0x02 ; 读取模式
+mov al,1 ; 读一个扇区
+mov dl,0x00 ; A盘
+int 0x13
+
+jnc READ_SUCCESS ;cf=0 代表成功读取
+
+READ_SUCCESS:
+jmp 09000h:0100h
 
 
-PRT_MSG:
+PRT_MSG: ;输出字符串
 		mov ax,BOOT_MSG
 		mov bp,ax
 		mov cx,13  			;串长度
@@ -46,7 +65,7 @@ PRT_MSG:
 
 BOOT_MSG:
 db "BOOT LOADED!"
-db 0x0a ;\n
+db 0ah ;\n
 
 resb 510-($-$$)   	;剩余空间填充
 

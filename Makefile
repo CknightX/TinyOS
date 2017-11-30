@@ -9,6 +9,11 @@ buildimage : boot.bin loader.bin
 	sudo cp loader.bin /mnt/floppy/ -v
 	sudo umount /mnt/floppy
 
+disp_data : 
+	xxd -u -a -g 1 -c 16 -s +0x4200 -l 0x11 a.img
+disp_root : 
+	xxd -u -a -g 1 -c 16 -s +0x2600 -l 512 a.img
+
 loader.bin : loader.asm
 	nasm loader.asm -o loader.bin
 
