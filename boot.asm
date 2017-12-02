@@ -48,7 +48,7 @@ LOAD_LOADER:
 
 READ_SECTOR:
 mov ah,0x02 ; 读取模式
-mov al,1 ; 读一个扇区,loader目前很小，一个扇区足以
+mov al,2 ; 读2个扇区
 mov dl,0x00 ; A盘
 int 0x13
 
