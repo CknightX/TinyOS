@@ -35,7 +35,9 @@ BOOT_START:
 		mov ss,ax
 		mov sp,100h
 
-; 加载LOADER到内存中，这里默认LOADER存放在数据区开始位置
+; 加载LOADER到内存中
+; 这里通过对磁盘的二进制分析，发现loader被放到了第二个目录项，即从第三个簇开始存放。
+; 对应的扇区号为34
 LOAD_LOADER:
 		mov bx,0100h
 		mov ax,09000h
@@ -53,10 +55,7 @@ int 0x13
 jnc READ_SUCCESS ;cf=0 代表成功读取
 
 READ_SUCCESS:
-mov si,LOAD_MSG
-call PRT_MSG
 jmp 09000h:0100h
-
 
 CLEAR: ;清屏
 	push ax
@@ -96,14 +95,9 @@ done:
 	ret
 
 
-BOOT_MSG:
-db "BOOT LOADED!"
-db 0ah ;\n
-db 0dh ;\r
-db 0
 
-LOAD_MSG:
-db "LOADER LOADED!"
+BOOT_MSG:
+db "BOOTING..."
 db 0ah ;\n
 db 0dh ;\r
 db 0
