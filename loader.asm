@@ -2,15 +2,26 @@ org 0100h
 
 ; TODO 加载GDT 进入保护模式
 jmp LABEL_BEGIN
+; 页目录开始地址
+PageDirBase equ 0x200000 ; 页目录开始地址:2M
+PageTblBase equ 0x201000 ; 页表开始地址:2M+4K  前4k为页目录表 
+PageTblAttr equ DA_DRW|DA_LIMIT_4K
+; 转化使用二级页表，第一个为页目录，大小为4KB，存储在一个物理页中，每个表项4B,共1024个表项
+; 每个表项对应第二级的一个页表，第二级的每一个页表有1024个表项，每一个表项对应一个物理页
+
+
+; GDT段
 
 %include "pm.inc"
-; GDT段
+
 [SECTION .gdt]
-LABEL_GDT:				Descriptor     0,0,0     					;空描述符
-LABEL_DESC_CODE32:		Descriptor     0,SegCode32Len-1,DA_C+DA_32  ;非一致32位代码段
-LABEL_DESC_DATA32:      Descriptor     0,SegData32Len-1,DA_DRW      ;32位数据段
-LABEL_DESC_STACK:		Descriptor	   0,TopofStack,DA_DRWA+DA_32   ;32位堆栈段
-LABEL_DESC_VIDEO:		Descriptor	   0xb8000,0xffff,DA_DRW		;显存
+LABEL_GDT:				Descriptor     0,0,0     					; 空描述符
+LABEL_DESC_CODE32:		Descriptor     0,SegCode32Len-1,DA_C+DA_32  ; 非一致32位代码段
+LABEL_DESC_DATA32:      Descriptor     0,SegData32Len-1,DA_DRW      ; 32位数据段
+LABEL_DESC_STACK:		Descriptor	   0,TopofStack,DA_DRWA+DA_32   ; 32位堆栈段
+LABEL_DESC_VIDEO:		Descriptor	   0xb8000,0xffff,DA_DRW		; 显存
+LABEL_DESC_PAGE_DIR:    Descriptor     PageDirBase,4095,DA_DRW		; 页目录
+LABEL_DESC_PAGE_TBL:    Descriptor     PageTblBase,1023,PageTblAttr ; 页表
 
 GdtLen equ $-LABEL_GDT  ; GDT长度(占用字节数)
 GdtPtr dw  GdtLen-1     ; GDT界限
@@ -22,6 +33,8 @@ SelectorData32 equ LABEL_DESC_DATA32-LABEL_GDT   ; 32位数据段选择子
 SelectorCode32 equ LABEL_DESC_CODE32-LABEL_GDT   ; 代码段选择子
 SelectorStack  equ LABEL_DESC_STACK-LABEL_GDT    ; 堆栈段选择子
 SelectorVideo  equ LABEL_DESC_VIDEO-LABEL_GDT    ; 显存段选择子
+SelectorPageDir equ LABEL_DESC_PAGE_DIR-LABEL_GDT; 页目录选择子
+SelectorPageTbl equ LABEL_DESC_PAGE_TBL-LABEL_GDT; 页表选择子
 ; END of [SECTION .gdt]
 
 ; 数据段
@@ -118,8 +131,50 @@ LABEL_SEG_CODE32:
 	mov ax,SelectorStack
 	mov ss,ax 
 
+	call SetupPageing ; 启动分页
 	call PRINT_PMMODE
 	jmp $  ; 到此结束
+
+; 启动分页机制,所有线性地址都等于物理地址
+SetupPageing:
+	; 初始化页目录
+	mov ax,SelectorPageDir
+	mov es,ax
+	mov ecx,1024 ; 1024个表项
+	xor edi,edi
+	xor eax,eax
+	mov eax,PageTblBase|PG_P|PG_USU|PG_RWW
+.1:
+	stosd ; eax-->es:edi
+	add eax,4096 ; 页表在内存中连续，跳到下一个页表的起始地址
+	loop .1
+
+
+	; 初始化所有页表
+	mov ax,SelectorPageTbl
+	mov es,ax
+	mov ecx,1024*1024 ; 1M个页表项
+	xor edi,edi
+	xor eax,eax
+	mov eax,PG_P|PG_USU|PG_RWW ; 从内存地址0开始
+.2:
+	stosd ; eax-->es:edi
+	add eax,4096 ; 每一个页指向4K的空间
+	loop .2
+
+	; 正式启动分页机制
+	mov eax,PageDirBase
+	mov cr3,eax ; cr3指向页目录表
+	mov eax,cr0
+	or eax,0x8000000
+	mov cr0,eax
+	jmp short .3
+.3:
+	nop
+	ret
+	
+
+
 
 
 ; 输出函数
