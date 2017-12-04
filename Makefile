@@ -3,7 +3,10 @@ CC = gcc
 VM = bochs
 LD = ld
 
-TARGET=boot.bin loader.bin kernel.bin
+TARGET = boot.bin loader.bin kernel.bin
+OBJS = kernel.o main.o
+CFLAGS = -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -c
+LD_FLAGS = -T link.ld -nostdlib
 
 
 
@@ -34,8 +37,13 @@ loader.bin : loader.asm
 boot.bin :  boot.asm
 	$(ASM) $< -o $@
 
-kernel.bin : kernel.asm
-	$(ASM) $< -o $@
+kernel.o : kernel.asm
+	$(ASM) $< -o $@ -f elf
+main.o : main.c 
+	$(CC) $< -o $@ $(CFLAGS)
+kernel.bin : $(OBJS)
+	$(LD) $(OBJS) -o $@ $(LD_FLAGS)
+
 
 
 clean : 
