@@ -3,11 +3,11 @@ CC = gcc
 VM = bochs
 LD = ld
 
-TARGET=boot.bin loader.bin
+TARGET=boot.bin loader.bin kernel.bin
 
 
 
-all : buildimage
+all : clean buildimage
 
 run : 
 	$(VM)	
@@ -19,9 +19,11 @@ disp_root :
 
 
 buildimage : $(TARGET)
+	bximage a.img -fd -size=1.44 -q
 	dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc
 	sudo mount -o loop a.img /mnt/floppy
 	sudo cp loader.bin /mnt/floppy/ -v
+	sudo cp kernel.bin /mnt/floppy/ -v
 	sudo umount /mnt/floppy
 
 
@@ -32,6 +34,11 @@ loader.bin : loader.asm
 boot.bin :  boot.asm
 	$(ASM) $< -o $@
 
+kernel.bin : kernel.asm
+	$(ASM) $< -o $@
+
 
 clean : 
-	rm *.bin
+	rm *.bin -f
+	rm *.o -f
+	rm *.img -f
