@@ -4,7 +4,7 @@ VM = bochs
 LD = ld
 
 TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
-OBJS = kernel/kernel.o kernel/main.o
+OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o
 CFLAGS = -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -c
 LD_FLAGS = -T script/link.ld -nostdlib
 
@@ -42,6 +42,12 @@ kernel/kernel.o : kernel/kernel.asm
 	$(ASM) $< -o $@ -f elf
 
 kernel/main.o : kernel/main.c 
+	$(CC) $< -o $@ $(CFLAGS)
+
+kernel/screen.o : kernel/screen.c
+	$(CC) $< -o $@ $(CFLAGS)
+
+kernel/common.o : kernel/common.c
 	$(CC) $< -o $@ $(CFLAGS)
 
 

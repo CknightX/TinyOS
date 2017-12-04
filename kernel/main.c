@@ -1,15 +1,14 @@
+#include "screen.h"
 int main(void)
 {
-	char* video=(char*)0xb8000;
-	const char* hehe="The deep dark fantasy!";
+	console_clear();
 	int i=0;
-	int j=0;
-	while(hehe[i]!='\0')
+	for (;i<10;++i)
 	{
-		video[j+(80*3+0)*2]=hehe[i];
-		j+=2;
-		i++;
+		console_putc_color(i+'0',rc_black,rc_white);
+		console_putc_color('\n',rc_black,rc_white);
 	}
+	console_write("The deep dark fantasy!");
 	for(;;);
 
 }

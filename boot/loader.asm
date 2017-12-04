@@ -88,12 +88,17 @@ READ_SUCCESS:
 [SECTION .s32]
 [BITS 32]
 LABEL_SEG_CODE32:
-	; 视频段选择子
+	; 视频段
 	mov ax,SelectorVideo
 	mov gs,ax
-	; 数据段选择子
+	; 数据段
 	mov ax,SelectorData
 	mov ds,ax
+	mov es,ax
+	mov fs,ax
+	mov ss,ax
+	mov esp,TopofStack
+
 
 	call PRINT_PM
 
@@ -168,8 +173,6 @@ PRINT_PAGE:
 	mov esi,BaseOfLoaderPhyAddr+PAGE_MSG
 	call PRINT_MSG
 	ret
-
-SegCode32Len equ $-LABEL_SEG_CODE32
 ; End of [SECTION .s32]
 
 [section .data1]
