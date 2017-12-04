@@ -3,17 +3,17 @@ CC = gcc
 VM = bochs
 LD = ld
 
-TARGET = boot.bin loader.bin kernel.bin
-OBJS = kernel.o main.o
+TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
+OBJS = kernel/kernel.o kernel/main.o
 CFLAGS = -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -c
-LD_FLAGS = -T link.ld -nostdlib
+LD_FLAGS = -T script/link.ld -nostdlib
 
 
 
 all : clean buildimage
 
 run : 
-	$(VM)	
+	$(VM) -f ./config/bochsrc
 
 disp_data : 
 	xxd -u -a -g 1 -c 16 -s +0x4200 -l 0x11 a.img
@@ -23,30 +23,30 @@ disp_root :
 
 buildimage : $(TARGET)
 	bximage a.img -fd -size=1.44 -q
-	dd if=boot.bin of=a.img bs=512 count=1 conv=notrunc
+	dd if=bin/boot.bin of=a.img bs=512 count=1 conv=notrunc
 	sudo mount -o loop a.img /mnt/floppy
-	sudo cp loader.bin /mnt/floppy/ -v
-	sudo cp kernel.bin /mnt/floppy/ -v
+	sudo cp bin/loader.bin /mnt/floppy/ -v
+	sudo cp bin/kernel.bin /mnt/floppy/ -v
 	sudo umount /mnt/floppy
 
-
-loader.bin : loader.asm
-	$(ASM) $< -o $@
-
-
-boot.bin :  boot.asm
-	$(ASM) $< -o $@
-
-kernel.o : kernel.asm
-	$(ASM) $< -o $@ -f elf
-main.o : main.c 
-	$(CC) $< -o $@ $(CFLAGS)
-kernel.bin : $(OBJS)
+bin/kernel.bin : $(OBJS)
 	$(LD) $(OBJS) -o $@ $(LD_FLAGS)
+
+bin/loader.bin : boot/loader.asm
+	$(ASM) $< -o $@ -I boot/include/
+
+bin/boot.bin :  boot/boot.asm
+	$(ASM) $< -o $@
+
+kernel/kernel.o : kernel/kernel.asm
+	$(ASM) $< -o $@ -f elf
+
+kernel/main.o : kernel/main.c 
+	$(CC) $< -o $@ $(CFLAGS)
 
 
 
 clean : 
-	rm *.bin -f
-	rm *.o -f
+	rm ./bin/*.bin -f
+	rm ./kernel/*.o -f
 	rm *.img -f

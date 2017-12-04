@@ -1,7 +1,11 @@
 OUTPUT_FORMAT("binary")
 ENTRY(start)
+phys = 0x80000;
 SECTIONS
 {
+
+	. = phys;
+
 	.text :
 	{
 		code = .;
