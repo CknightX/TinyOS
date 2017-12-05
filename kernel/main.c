@@ -1,14 +1,20 @@
 #include "screen.h"
+#include "string.h"
+char str[100]="van:";
+
 int main(void)
 {
 	console_clear();
-	int i=0;
-	for (;i<10;++i)
-	{
-		console_putc_color(i+'0',rc_black,rc_white);
-		console_putc_color('\n',rc_black,rc_white);
-	}
-	console_write("The deep dark fantasy!");
+	const char* ddf="the deep dark fantasy\n";
+	const char* bnd="boy next door\n";
+	strcat(str,ddf);
+	strcat(str,bnd);
+
+	console_write(str);
+
+
+
+	
 	for(;;);
 
 }
