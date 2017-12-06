@@ -9,4 +9,6 @@ uint8_t inb(uint16_t port);
 // 端口读一个字
 uint16_t inw(uint16_t port);
 
+void delay();
+
 #endif

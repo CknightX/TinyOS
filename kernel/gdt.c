@@ -1,19 +1,21 @@
 #include "gdt.h"
 #include "string.h"
 #include "const.h"
+#include "common.h"
 #include "debug.h"
 GdtPtr gdt_ptr;
 Descriptor gdt[GDT_SIZE];
 
 void init_gdt()
 {
+	delay();
 	console_clear();
 	// 将loader中的GDT复制到新的GDT中
 	memcpy((uint8_t*)&gdt,(uint8_t*)gdt_ptr.base,(uint32_t)gdt_ptr.limit+1);
 
 	gdt_ptr.base=(uint32_t)&gdt;
 	gdt_ptr.limit=GDT_SIZE*sizeof(Descriptor)-1;
-	console_write("\nGDT inited\n");
+	console_write("GDT inited\n");
 
 }
 /*

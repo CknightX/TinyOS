@@ -2,6 +2,8 @@
 #define _GDT_h
 #include "types.h"
 
+void init_gdt();
+
 typedef struct _Descriptor
 {
 	uint16_t limit_low;

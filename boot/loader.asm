@@ -73,7 +73,7 @@ READ_KERNEL:
 
 READ_SECTOR:
 mov ah,0x02 ; 读取模式
-mov al,16 ; 读2个扇区
+mov al,30 ; 读2个扇区
 mov dl,0x00 ; A盘
 int 0x13
 

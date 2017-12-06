@@ -1,5 +1,5 @@
 ASM = nasm
-CC = gcc
+CC = gcc -I include/
 VM = bochs
 LD = ld
 
@@ -9,7 +9,8 @@ CFLAGS = -Wall -Werror -nostdinc -fno-builtin -fno-stack-protector -funsigned-ch
 
 TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
 OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o kernel/string.o\
-	   kernel/printk.o kernel/gdt.o
+	   kernel/printk.o kernel/gdt.o kernel/idt.o
+
 LD_FLAGS = -T script/link.ld -nostdlib
 
 
@@ -61,6 +62,9 @@ kernel/printk.o : kernel/printk.c
 	$(CC) $< -o $@ $(CFLAGS)
 
 kernel/gdt.o : kernel/gdt.c
+	$(CC) $< -o $@ $(CFLAGS)
+
+kernel/idt.o : kernel/idt.c
 	$(CC) $< -o $@ $(CFLAGS)
 
 
