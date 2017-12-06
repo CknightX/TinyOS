@@ -3,9 +3,13 @@ CC = gcc
 VM = bochs
 LD = ld
 
+CFLAGS = -Wall -Werror -nostdinc -fno-builtin -fno-stack-protector -funsigned-char \
+		 		 -finline-functions -finline-small-functions -findirect-inlining \
+				 		 -finline-functions-called-once -m32 -g -c
+
 TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
-OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o kernel/string.o
-CFLAGS = -Wall -O -fstrength-reduce -fomit-frame-pointer -finline-functions -nostdinc -fno-builtin -c
+OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o kernel/string.o\
+	   kernel/printk.o kernel/gdt.o
 LD_FLAGS = -T script/link.ld -nostdlib
 
 
@@ -49,9 +53,21 @@ kernel/screen.o : kernel/screen.c
 
 kernel/common.o : kernel/common.c
 	$(CC) $< -o $@ $(CFLAGS)
+
 kernel/string.o : kernel/string.c
 	$(CC) $< -o $@ $(CFLAGS)
 
+kernel/printk.o : kernel/printk.c
+	$(CC) $< -o $@ $(CFLAGS)
+
+kernel/gdt.o : kernel/gdt.c
+	$(CC) $< -o $@ $(CFLAGS)
+
+
+debug : 
+	qemu -S -s -fda a.img -boot a &
+	sleep 1
+	cgdb -x script/gdbinit
 
 
 clean : 
