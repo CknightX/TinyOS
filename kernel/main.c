@@ -7,6 +7,5 @@ int main(void)
 {
 	delay();
 	printk("OS now\n");
-	//asm volatile ("int $0x4");
 	return 0;
 }
