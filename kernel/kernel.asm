@@ -1,15 +1,20 @@
-SELECTOR_KERNEL_CS equ 8
+%include "sconst.inc"
+
+
 ; 导出函数
 global start
 global idt_flush
+global restart
 ; 
 extern idt_ptr
 extern gdt_ptr
 extern init_gdt
 extern init_idt
+extern init_proc
 extern exception_handler
 extern spurious_irq 
 extern main
+extern tss
 ; 导出异常处理函数
 global	divide_error
 global	single_step_exception
@@ -46,7 +51,7 @@ global  hwint14
 global  hwint15
 
 [BITS 32]
-ALIGN 4
+
 ; 代码段
 [SECTION .text]
 
@@ -65,13 +70,16 @@ start:
 	; 强制使用刚刚初始化的结构
 	call init_idt
 	lidt [idt_ptr]
-	jmp SELECTOR_KERNEL_CS:csinit
+	jmp SELECTOR_KERNEL_CS:csinit ;这里为什么不用+kernelphyaddr？
 
 csinit:
-	call main
-	sti
-	hlt
-	jmp $
+	;sti
+	call init_proc
+	xor eax,eax
+	mov ax,SELECTOR_TSS ; TSS 选择子
+	ltr ax
+	jmp main ;直接跳到main执行
+
 
 
 ; 中断和异常 -- 硬件中断
@@ -86,7 +94,10 @@ csinit:
 
 ALIGN   16
 hwint00:                ; Interrupt routine for irq 0 (the clock).
-        hwint_master    0
+	inc byte [gs:0]
+	mov al,EOI
+	out INT_M_CTL,al
+	iretd
 
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)
@@ -221,8 +232,25 @@ exception:
 	call exception_handler
 	add esp,4*2
 	hlt
+; 第一个进程的入口
+restart:
 
+	extern p_proc_ready
+	mov esp,[p_proc_ready] ;进程表
+	lldt [esp+P_LDT_SEL]   ;装载LDT
+	lea eax,[esp+P_STACKTOP] ;计算栈顶地址
+	mov dword [tss+TSS3_S_SP0],eax ; 将ring0的栈顶保存到tss ring0处
+
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	popad
+	add esp,4
+	iretd
+
+
+; 堆栈段
 [SECTION .bss]
 StackSpace resb 2*1024
 StackTop: ;栈顶
-

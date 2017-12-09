@@ -46,7 +46,7 @@ void init_8259A()
 	outb(INT_S_CTLMASK,	0x1);
 
 	/* Master 8259, OCW1.  */
-	outb(INT_M_CTLMASK,	0xFD); //开启键盘中断
+	outb(INT_M_CTLMASK,	0xFC); //开启键盘和时钟中断
 
 	/* Slave  8259, OCW1.  */
 	outb(INT_S_CTLMASK,	0xFF);
@@ -87,12 +87,10 @@ void    hwint13();
 void    hwint14();
 void    hwint15();
 /*======================================================================*
-  init_prot
+  init_intp_
  *======================================================================*/
-void init_prot()
+void init_intp()
 {
-
-	init_8259A();
 
 	// 全部初始化成中断门(没有陷阱门)
 	init_idt_desc(INT_VECTOR_DIVIDE,	DA_386IGate,
@@ -272,12 +270,14 @@ void spurious_irq(int irq)
 
 void init_idt()
 {
+	init_8259A();
+	
 	/* idt_ptr[6] 共 6 个字节：0~15:Limit  16~47:Base。用作 sidt/lidt 的参数。*/
 	uint16_t* p_idt_limit = (uint16_t*)(&idt_ptr[0]);
 	uint32_t* p_idt_base  = (uint32_t*)(&idt_ptr[2]);
 	*p_idt_limit = 256 * sizeof(GATE) - 1;
 	*p_idt_base  = (uint32_t)&idt;
 
-	init_prot();
+	init_intp();
 	printk("IDT inited.\n");
 }
