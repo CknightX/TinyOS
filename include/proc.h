@@ -23,7 +23,7 @@ typedef struct stackframe
 	uint32_t eflags;
 	uint32_t esp;
 	uint32_t ss;
-}StackFrame;
+}__attribute__((packed)) StackFrame;
 
 typedef struct proc
 {
@@ -65,7 +65,7 @@ typedef struct s_tss {
 	uint32_t	ldt;
 	uint16_t	trap;
 	uint16_t	iobase;	/* I/O位图基址大于或等于TSS段界限，就表示没有I/O许可位图 */
-}TSS;
+}__attribute__((packed)) TSS;
 
 void init_proc();
 void init_proc_table();

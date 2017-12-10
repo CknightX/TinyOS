@@ -15,6 +15,7 @@ extern exception_handler
 extern spurious_irq 
 extern main
 extern tss
+extern printk
 ; 导出异常处理函数
 global	divide_error
 global	single_step_exception
@@ -51,6 +52,14 @@ global  hwint14
 global  hwint15
 
 [BITS 32]
+; 堆栈段
+[SECTION .bss]
+StackSpace resb 2*1024
+StackTop: ;栈顶
+
+; 数据段
+[SECTION .data]
+clock_int_msg db '^',0
 
 ; 代码段
 [SECTION .text]
@@ -94,9 +103,46 @@ csinit:
 
 ALIGN   16
 hwint00:                ; Interrupt routine for irq 0 (the clock).
+	; 此时堆栈为
+	sub esp,4 ;跳过retaddr
+
+	; 保护现场
+	pushad
+	push ds
+	push es
+	push fs
+	push gs
+
+	mov dx,ss
+	mov ds,dx
+	mov es,dx
+
+	mov esp,StackTop   ; 切换到内核栈
+
 	inc byte [gs:0]
+
+	; 再次打开中断,使其可以继续接受中断
 	mov al,EOI
-	out INT_M_CTL,al
+	out INT_M_CTL,al 
+
+	push clock_int_msg
+	call printk
+	add esp,4
+
+	mov esp,[p_proc_ready] ;离开内核栈,指向进程表地址低处
+	 
+	lea eax,[esp+P_STACKTOP]
+	mov dword [tss+TSS3_S_SP0],eax
+
+	; 恢复现场
+	pop gs
+	pop fs
+	pop es
+	pop ds
+	popad
+
+	add esp,4
+
 	iretd
 
 ALIGN   16
@@ -234,7 +280,6 @@ exception:
 	hlt
 ; 第一个进程的入口
 restart:
-
 	extern p_proc_ready
 	mov esp,[p_proc_ready] ;进程表
 	lldt [esp+P_LDT_SEL]   ;装载LDT
@@ -250,7 +295,3 @@ restart:
 	iretd
 
 
-; 堆栈段
-[SECTION .bss]
-StackSpace resb 2*1024
-StackTop: ;栈顶

@@ -22,6 +22,7 @@ int main(void)
 	printk("OS now\n");
 	delay(2);
 	p_proc_ready=proc_table;
-	restart();
+
+	restart(); //进入进程
 	while(1){}
 }

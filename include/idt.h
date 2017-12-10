@@ -19,7 +19,7 @@ typedef struct s_descriptor		/* 共 8 个字节 */
 	uint8_t	attr1;			/* P(1) DPL(2) DT(1) TYPE(4) */
 	uint8_t	limit_high_attr2;	/* G(1) D(1) 0(1) AVL(1) LimitHigh(4) */
 	uint8_t	base_high;		/* Base */
-}DESCRIPTOR;
+}__attribute__((packed)) DESCRIPTOR;
 
 /* 门描述符 */
 typedef struct s_gate
@@ -33,7 +33,7 @@ typedef struct s_gate
 				   发生时，要复制的双字参数的数量。*/
 	uint8_t	attr;		/* P(1) DPL(2) DT(1) TYPE(4) */
 	uint16_t	offset_high;	/* Offset High */
-}GATE;
+}__attribute__((packed)) GATE;
 
 
 
