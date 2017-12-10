@@ -9,7 +9,7 @@ CFLAGS = -Wall -Werror -nostdinc -fno-builtin -fno-stack-protector -funsigned-ch
 
 TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
 OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o kernel/string.o\
-	   kernel/printk.o kernel/gdt.o kernel/idt.o kernel/proc.o
+	   kernel/printk.o kernel/gdt.o kernel/idt.o kernel/proc.o kernel/clock.o
 
 LD_FLAGS = -T script/link.ld -nostdlib
 
@@ -68,6 +68,9 @@ kernel/idt.o : kernel/idt.c
 	$(CC) $< -o $@ $(CFLAGS)
 	
 kernel/proc.o : kernel/proc.c
+	$(CC) $< -o $@ $(CFLAGS)
+
+kernel/clock.o : kernel/clock.c
 	$(CC) $< -o $@ $(CFLAGS)
 	
 

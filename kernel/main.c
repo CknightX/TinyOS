@@ -2,9 +2,7 @@
 #include "string.h"
 #include "idt.h"
 #include "proc.h"
-char str[100]="van:";
 
-extern Process* p_proc_ready;
 extern void restart();
 
 void test1()
@@ -15,6 +13,17 @@ void test1()
 		printk("A%d.",i++);
 		delay(1);
 	}
+}
+
+void test2()
+{
+	int i=0x1000;
+	while(1)
+	{
+		printk("B%d.",i++);
+		delay(1);
+	}
+	
 }
 
 int main(void)

@@ -1,10 +1,12 @@
 #ifndef _CONST_H
 #define _CONST_H
 
-#define NR_TASKS 1
+
+#define NR_TASKS 2 //最大任务数
 #define INDEX_TSS 4
 #define STACK_SIZE_TESTA	0x8000
-#define STACK_SIZE_TOTAL	STACK_SIZE_TESTA
+#define STACK_SIZE_TESTB	0x8000
+#define STACK_SIZE_TOTAL	(STACK_SIZE_TESTA+STACK_SIZE_TESTB)
 
 #define GDT_SIZE 128
 #define IDT_SIZE 256

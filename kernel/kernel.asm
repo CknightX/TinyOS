@@ -5,7 +5,7 @@
 global start
 global idt_flush
 global restart
-; 
+; 导入函数 
 extern idt_ptr
 extern gdt_ptr
 extern init_gdt
@@ -14,8 +14,13 @@ extern init_proc
 extern exception_handler
 extern spurious_irq 
 extern main
-extern tss
 extern printk
+extern delay
+extern clock_handler
+; 导入变量
+extern tss
+extern k_reenter;
+
 ; 导出异常处理函数
 global	divide_error
 global	single_step_exception
@@ -117,23 +122,33 @@ hwint00:                ; Interrupt routine for irq 0 (the clock).
 	mov ds,dx
 	mov es,dx
 
-	mov esp,StackTop   ; 切换到内核栈
 
+	; 第一个字符跳动
 	inc byte [gs:0]
 
-	; 再次打开中断,使其可以继续接受中断
 	mov al,EOI
 	out INT_M_CTL,al 
 
-	push clock_int_msg
-	call printk
-	add esp,4
+	; 防止嵌套时钟中断
+	inc byte [k_reenter]
+	cmp byte [k_reenter], 0
+	jne .re_enter
 
+	mov esp,StackTop   ; 切换到内核栈
+
+	sti ; 开中断
+	push 0
+	call clock_handler
+	add esp,4
+	cli
 	mov esp,[p_proc_ready] ;离开内核栈,指向进程表地址低处
+	lldt [esp+P_LDT_SEL]
 	 
 	lea eax,[esp+P_STACKTOP]
 	mov dword [tss+TSS3_S_SP0],eax
 
+.re_enter:
+	dec byte [k_reenter]
 	; 恢复现场
 	pop gs
 	pop fs

@@ -2,6 +2,14 @@
 #define _PROC_H
 #include "gdt.h"
 #include "const.h"
+#include "types.h"
+
+typedef struct s_task
+{
+	task_f initial_eip;
+	int stacksize;
+	char name[32];
+}__attribute__((packed)) TASK;
 
 typedef struct stackframe
 {
@@ -72,4 +80,8 @@ void init_proc_table();
 uint32_t seg2phys(uint16_t seg);
 extern Process proc_table[];
 extern char task_stack[];
+extern int8_t k_reenter;
+extern Process* p_proc_ready;
+// 进程表
+extern TASK task_table[NR_TASKS];
 #endif 
