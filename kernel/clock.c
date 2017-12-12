@@ -2,6 +2,7 @@
 #include "proc.h"
 void clock_handler(int irq)
 {
+	++ticks;
 	printk("#");
 	if (k_reenter!=0)
 	{

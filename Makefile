@@ -9,7 +9,8 @@ CFLAGS = -Wall -Werror -nostdinc -fno-builtin -fno-stack-protector -funsigned-ch
 
 TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
 OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o kernel/string.o\
-	   kernel/printk.o kernel/gdt.o kernel/idt.o kernel/proc.o kernel/clock.o kernel/utils.o
+	   kernel/printk.o kernel/gdt.o kernel/idt.o kernel/proc.o kernel/clock.o kernel/utils.o\
+	   kernel/syscall.o
 
 LD_FLAGS = -T script/link.ld -nostdlib
 
@@ -75,9 +76,10 @@ kernel/clock.o : kernel/clock.c
 
 kernel/utils.o : kernel/utils.asm
 	$(ASM) $< -o $@ -f elf -I include/
-	
-	
 
+kernel/syscall.o : kernel/syscall.asm
+	$(ASM) $< -o $@ -f elf -I include/
+	
 
 debug : 
 	qemu -S -s -fda a.img -boot a &

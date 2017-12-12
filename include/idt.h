@@ -5,6 +5,9 @@
 #include "const.h"
 
 #define CLOCK_IRQ 0
+#define INT_VECTOR_SYS_CALL 0x90
+
+extern int8_t k_reenter;
 
 void enable_irq (int irq);
 void disable_irq (int irq);

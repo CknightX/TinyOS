@@ -21,6 +21,7 @@ extern clock_handler
 extern tss
 extern k_reenter
 extern irq_table
+extern sys_call_table
 
 ; 导出异常处理函数
 global	divide_error
@@ -56,6 +57,8 @@ global  hwint12
 global  hwint13
 global  hwint14
 global  hwint15
+
+global sys_call
 
 [BITS 32]
 ; 堆栈段
@@ -133,17 +136,17 @@ save:
 	mov ds,dx
 	mov es,dx
 
-	mov eax,esp ; 进程表起始地址
+	mov esi,esp ; 进程表起始地址
 	inc byte [k_reenter]
 	cmp byte [k_reenter],0
 	jne .reenter
 	mov esp,StackTop  ; 切换到内核栈
 	push restart
-	jmp [eax+RETADR-P_STACKBASE] ; 返回到call save的下一条语句执行
+	jmp [esi+RETADR-P_STACKBASE] ; 返回到call save的下一条语句执行
 
 .reenter:
 	push restart_reenter
-	jmp [eax+RETADR-P_STACKBASE] 
+	jmp [esi+RETADR-P_STACKBASE] 
 
 
 ALIGN   16
@@ -301,3 +304,10 @@ restart_reenter:
 	iretd
 
 
+sys_call:
+	call save
+	sti
+	call [sys_call_table+eax*4]
+	mov [esi+EAXREG-P_STACKBASE],eax
+	cli
+	ret

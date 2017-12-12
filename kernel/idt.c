@@ -13,13 +13,18 @@
 uint8_t		idt_ptr[6];	/* 0~15:Limit  16~47:Base */
 GATE		idt[IDT_SIZE];
 
+int8_t k_reenter=0;
+
 
 void init_idt_desc(unsigned char vector, uint8_t desc_type,
 		int_handler handler, unsigned char privilege);
 
+// 中断处理函数
 irq_handler irq_table[NR_IRQ];
 
 
+// syscall.asm
+extern void sys_call();
 
 
 void spurious_irq();
@@ -199,6 +204,9 @@ void init_intp()
 
 	init_idt_desc(INT_VECTOR_IRQ8 + 7,      DA_386IGate,
 			hwint15,                  PRIVILEGE_KRNL);
+
+	// 初始化系统调用的中断门
+	init_idt_desc(INT_VECTOR_SYS_CALL,DA_386IGate,sys_call,PRIVILEGE_USER);
 }
 
 /*======================================================================*

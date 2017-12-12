@@ -4,6 +4,8 @@
 #include "const.h"
 #include "types.h"
 
+int ticks;
+
 typedef struct s_task
 {
 	task_f initial_eip;
@@ -84,4 +86,8 @@ extern int8_t k_reenter;
 extern Process* p_proc_ready;
 // 进程表
 extern TASK task_table[NR_TASKS];
+// 系统调用表
+extern system_call sys_call_table[];
+// 系统调用
+int sys_get_ticks();
 #endif 

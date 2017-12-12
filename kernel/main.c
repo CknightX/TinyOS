@@ -5,13 +5,13 @@
 
 extern void clock_handler();
 extern void restart();
+extern int get_ticks();
 
 void test1()
 {
-	int i=0;
 	while(1)
 	{
-		printk("A%d.",i++);
+		printk("A%d.",get_ticks());
 		delay(1);
 	}
 }
@@ -29,6 +29,7 @@ void test2()
 
 int _osmain(void)
 {
+	ticks=0;
 	printk("OS now\n");
 	delay(2);
 	p_proc_ready=proc_table;

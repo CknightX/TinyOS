@@ -4,14 +4,16 @@
 extern Descriptor gdt[];
 void test1();
 void test2();
+// 系统调用
+
+// 系统调用表
+system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks};
 
 Process* p_proc_ready;
 Process proc_table[NR_TASKS];  //进程表
 char task_stack[STACK_SIZE_TOTAL];
 TASK task_table[NR_TASKS]={{test1,STACK_SIZE_TESTA,"A"},{test2,STACK_SIZE_TESTB,"B"}};
 TSS tss;
-
-int8_t k_reenter=0; //嵌套中断
 
 /*======================================================================*
   init_descriptor
@@ -104,4 +106,10 @@ void init_proc()
 
 	init_proc_table();
 
+}
+
+// 系统调用
+int sys_get_ticks()
+{
+	return ticks;
 }
