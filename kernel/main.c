@@ -3,6 +3,7 @@
 #include "idt.h"
 #include "proc.h"
 
+extern void clock_handler();
 extern void restart();
 
 void test1()
@@ -26,11 +27,14 @@ void test2()
 	
 }
 
-int main(void)
+int _osmain(void)
 {
 	printk("OS now\n");
 	delay(2);
 	p_proc_ready=proc_table;
+
+	set_irq_handler(CLOCK_IRQ,clock_handler);
+	enable_irq(CLOCK_IRQ);
 
 	restart(); //进入进程
 	while(1){}

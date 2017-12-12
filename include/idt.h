@@ -4,6 +4,12 @@
 #define	_ORANGES_PROTECT_H_
 #include "const.h"
 
+#define CLOCK_IRQ 0
+
+void enable_irq (int irq);
+void disable_irq (int irq);
+void set_irq_handler(int irq,irq_handler handler);
+
 typedef	void	(*int_handler)	();
 
 void 	init_idt();

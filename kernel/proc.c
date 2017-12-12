@@ -11,7 +11,7 @@ char task_stack[STACK_SIZE_TOTAL];
 TASK task_table[NR_TASKS]={{test1,STACK_SIZE_TESTA,"A"},{test2,STACK_SIZE_TESTB,"B"}};
 TSS tss;
 
-int8_t k_reenter=-1; //嵌套中断
+int8_t k_reenter=0; //嵌套中断
 
 /*======================================================================*
   init_descriptor

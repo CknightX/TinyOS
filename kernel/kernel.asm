@@ -13,13 +13,14 @@ extern init_idt
 extern init_proc
 extern exception_handler
 extern spurious_irq 
-extern main
+extern _osmain
 extern printk
 extern delay
 extern clock_handler
 ; 导入变量
 extern tss
-extern k_reenter;
+extern k_reenter
+extern irq_table
 
 ; 导出异常处理函数
 global	divide_error
@@ -92,26 +93,36 @@ csinit:
 	xor eax,eax
 	mov ax,SELECTOR_TSS ; TSS 选择子
 	ltr ax
-	jmp main ;直接跳到main执行
+	jmp _osmain ;直接跳到main执行
 
 
 
 ; 中断和异常 -- 硬件中断
 ; ---------------------------------
 %macro  hwint_master    1
-        push    %1
-        call    spurious_irq
-        add     esp, 4
-        hlt
+	call save
+	; 屏蔽当前中断
+	in al,INT_M_CTLMASK
+	or al,(1 << %1) 
+	out INT_M_CTLMASK,al
+	; 置EOI
+	mov al,EOI 
+	out INT_M_CTL,al
+	; 中断处理程序
+	sti
+	push %1
+	call [irq_table+4 * %1]
+	pop ecx
+	cli
+	; 允许中断
+	in al,INT_M_CTLMASK
+	and al, ~(1 << %1)
+	out INT_M_CTLMASK,al
+	ret
 %endmacro
 ; ---------------------------------
 
-ALIGN   16
-hwint00:                ; Interrupt routine for irq 0 (the clock).
-	; 此时堆栈为
-	sub esp,4 ;跳过retaddr
-
-	; 保护现场
+save:
 	pushad
 	push ds
 	push es
@@ -122,44 +133,23 @@ hwint00:                ; Interrupt routine for irq 0 (the clock).
 	mov ds,dx
 	mov es,dx
 
-
-	; 第一个字符跳动
-	inc byte [gs:0]
-
-	mov al,EOI
-	out INT_M_CTL,al 
-
-	; 防止嵌套时钟中断
+	mov eax,esp ; 进程表起始地址
 	inc byte [k_reenter]
-	cmp byte [k_reenter], 0
-	jne .re_enter
+	cmp byte [k_reenter],0
+	jne .reenter
+	mov esp,StackTop  ; 切换到内核栈
+	push restart
+	jmp [eax+RETADR-P_STACKBASE] ; 返回到call save的下一条语句执行
 
-	mov esp,StackTop   ; 切换到内核栈
+.reenter:
+	push restart_reenter
+	jmp [eax+RETADR-P_STACKBASE] 
 
-	sti ; 开中断
-	push 0
-	call clock_handler
-	add esp,4
-	cli
-	mov esp,[p_proc_ready] ;离开内核栈,指向进程表地址低处
-	lldt [esp+P_LDT_SEL]
-	 
-	lea eax,[esp+P_STACKTOP]
-	mov dword [tss+TSS3_S_SP0],eax
 
-.re_enter:
-	dec byte [k_reenter]
-	; 恢复现场
-	pop gs
-	pop fs
-	pop es
-	pop ds
-	popad
-
-	add esp,4
-
-	iretd
-
+ALIGN   16
+hwint00:                ; Interrupt routine for irq 0 (the clock).
+	hwint_master 0
+	
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)
         hwint_master    1
@@ -293,14 +283,15 @@ exception:
 	call exception_handler
 	add esp,4*2
 	hlt
-; 第一个进程的入口
+; 进程的入口
 restart:
 	extern p_proc_ready
 	mov esp,[p_proc_ready] ;进程表
 	lldt [esp+P_LDT_SEL]   ;装载LDT
 	lea eax,[esp+P_STACKTOP] ;计算栈顶地址
 	mov dword [tss+TSS3_S_SP0],eax ; 将ring0的栈顶保存到tss ring0处
-
+restart_reenter:
+	dec byte [k_reenter]
 	pop gs
 	pop fs
 	pop es

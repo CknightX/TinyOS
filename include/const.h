@@ -3,6 +3,7 @@
 
 
 #define NR_TASKS 2 //最大任务数
+#define NR_IRQ   16 //主从 8259A管理的外部中断数
 #define INDEX_TSS 4
 #define STACK_SIZE_TESTA	0x8000
 #define STACK_SIZE_TESTB	0x8000

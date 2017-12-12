@@ -8,6 +8,7 @@ typedef unsigned char uint8_t;
 typedef char int8_t;
 
 typedef void (*task_f)();
+typedef void (*irq_handler)(int irq);
 
 
 

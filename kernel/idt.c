@@ -17,10 +17,19 @@ GATE		idt[IDT_SIZE];
 void init_idt_desc(unsigned char vector, uint8_t desc_type,
 		int_handler handler, unsigned char privilege);
 
+irq_handler irq_table[NR_IRQ];
 
+
+
+
+void spurious_irq();
 
 void init_8259A()
 {
+	// 初始化其他中断
+	for (int i=0;i<NR_IRQ;++i)
+		irq_table[i]=spurious_irq;
+
 	/* Master 8259, ICW1. */
 	outb(INT_M_CTL,	0x11);
 
@@ -52,7 +61,7 @@ void init_8259A()
 	outb(INT_S_CTLMASK,	0xFF);
 }
 
-/* 中断处理函数 */
+/* 异常处理函数 */
 void	divide_error();
 void	single_step_exception();
 void	nmi();
@@ -280,4 +289,10 @@ void init_idt()
 
 	init_intp();
 	printk("IDT inited.\n");
+}
+
+void set_irq_handler(int irq,irq_handler handler)
+{
+	disable_irq(irq);
+	irq_table[irq]=handler;
 }
