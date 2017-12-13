@@ -6,13 +6,14 @@
 extern void clock_handler();
 extern void restart();
 extern int get_ticks();
+extern void milli_delay(int milli_sec);
 
 void test1()
 {
 	while(1)
 	{
 		printk("A%d.",get_ticks());
-		delay(1);
+		milli_delay(1000);
 	}
 }
 
