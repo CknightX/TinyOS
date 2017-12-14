@@ -26,16 +26,19 @@ void milli_delay(int milli_sec)
 void clock_handler(int irq)
 {
 	++ticks;
-	printk("#");
+//	printk("#");
 	// 中断重入
+	--p_proc_ready->ticks;
 	if (k_reenter!=0)
 	{
-		printk("!");
+//		printk("!");
 		return;
 	}
 
-	p_proc_ready++;
-	if (p_proc_ready>=proc_table+NR_TASKS)
-		p_proc_ready=proc_table; //回到第一个进程处
+	// 当一个进程ticks还未到0时，其他进程就不会被调度
+	if (p_proc_ready->ticks>0)
+		return;
+
+	schedule();
 	
 }

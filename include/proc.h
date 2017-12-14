@@ -40,6 +40,10 @@ typedef struct proc
 	StackFrame regs; 			//寄存器
 	uint16_t ldt_sel; 			//进程对应的GDT中的LDT选择子
 	Descriptor ldts[LDT_SIZE];  //进程LDT中的代码和数据段选择子
+
+	int ticks;	// 剩下的ticks
+	int priority; // 优先级
+
 	uint32_t pid; 				//进程的id
 	char p_name[16]; 			//进程名
 	
@@ -90,4 +94,6 @@ extern TASK task_table[NR_TASKS];
 extern system_call sys_call_table[];
 // 系统调用
 int sys_get_ticks();
+// 进程调度
+void schedule();
 #endif 

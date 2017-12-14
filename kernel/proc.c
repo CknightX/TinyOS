@@ -4,6 +4,7 @@
 extern Descriptor gdt[];
 void test1();
 void test2();
+void test3();
 // 系统调用
 
 // 系统调用表
@@ -12,7 +13,8 @@ system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks};
 Process* p_proc_ready;
 Process proc_table[NR_TASKS];  //进程表
 char task_stack[STACK_SIZE_TOTAL];
-TASK task_table[NR_TASKS]={{test1,STACK_SIZE_TESTA,"A"},{test2,STACK_SIZE_TESTB,"B"}};
+TASK task_table[NR_TASKS]={{test1,STACK_SIZE_TESTA,"A"},{test2,STACK_SIZE_TESTB,"B"},
+	{test3,STACK_SIZE_TESTC,"C"}};
 TSS tss;
 
 /*======================================================================*
@@ -106,6 +108,30 @@ void init_proc()
 
 	init_proc_table();
 
+}
+
+// 进程调度
+void schedule()
+{
+	Process* p;
+	int greatest_ticks=0;
+
+	while(!greatest_ticks)
+	{
+		for (p=proc_table;p<proc_table+NR_TASKS;++p)
+		{
+			if (p->ticks>greatest_ticks)
+			{
+				greatest_ticks=p->ticks;
+				p_proc_ready=p;
+			}
+		}
+		if (!greatest_ticks)
+		{
+			for (p=proc_table;p<proc_table+NR_TASKS;++p)
+				p->ticks=p->priority;
+		}
+	}
 }
 
 // 系统调用
