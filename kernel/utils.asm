@@ -2,6 +2,8 @@
 
 global enable_irq
 global disable_irq
+global disable_int
+global enable_int
 
 ; ========================================================================
 ;                  void disable_irq(int irq);
@@ -74,4 +76,12 @@ enable_8:
 	popf
 	ret
 
+
+;-------------------disable/enable_int()--------------
+disable_int:
+	cli
+	ret
+enable_int:
+	sti
+	ret
 

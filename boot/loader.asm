@@ -24,8 +24,8 @@ GdtPtr dw  GdtLen-1     ; GDT界限
 
 
 ; GDT 选择子
-SelectorData equ LABEL_DESC_FLAT_RW-LABEL_GDT   ; 32位数据段选择子
 SelectorCode equ LABEL_DESC_FLAT_C-LABEL_GDT   ; 代码段选择子
+SelectorData equ LABEL_DESC_FLAT_RW-LABEL_GDT   ; 32位数据段选择子
 SelectorVideo  equ LABEL_DESC_VIDEO-LABEL_GDT    ; 堆栈段选择子
 
 BaseofStack equ 0100h
@@ -34,8 +34,8 @@ PageTblBase equ 101000h
 
 
 ; 16位代码段
-[SECTION .s16]
 [BITS 16] 
+[SECTION .s16]
 
 LABEL_BEGIN:
 	mov ax,cs
@@ -63,6 +63,7 @@ LABEL_BEGIN:
 	; 进入保护模式
 	jmp dword SelectorCode:(BaseOfLoaderPhyAddr+LABEL_SEG_CODE32) ; 将SelectorCode32 装入cs
 
+; 将kernel由软盘读到内存中
 READ_KERNEL:
 	mov bx,0
 	mov ax,BaseOfKernelFile
@@ -73,7 +74,7 @@ READ_KERNEL:
 
 READ_SECTOR:
 mov ah,0x02 ; 读取模式
-mov al,30 ; 读2个扇区
+mov al,38 ; 读35个扇区
 mov dl,0x00 ; A盘
 int 0x13
 
@@ -85,8 +86,8 @@ READ_SUCCESS:
 
 
 ; 以下为32位代码段
-[SECTION .s32]
 [BITS 32]
+[SECTION .s32]
 LABEL_SEG_CODE32:
 	; 视频段
 	mov ax,SelectorVideo

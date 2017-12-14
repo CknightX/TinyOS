@@ -3,16 +3,30 @@
 #include "common.h"
 #include "types.h"
 #include "const.h"
+#include "idt.h"
+
+
+
 
 // syscall.asm
 extern int get_ticks();
 
-void set_8253()
+void clock_handler(int irq);
+
+static void set_8253()
 {
 
 	outb(TIMER_MODE, RATE_GENERATOR);
 	outb(TIMER0, (uint8_t) (TIMER_FREQ/HZ) );
 	outb(TIMER0, (uint8_t) ((TIMER_FREQ/HZ) >> 8));
+}
+
+void init_clock()
+{
+	set_8253();
+	set_irq_handler(CLOCK_IRQ,clock_handler);
+	enable_irq(CLOCK_IRQ);
+	ticks=0;
 }
 
 // 毫秒为单位的延迟函数

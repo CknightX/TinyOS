@@ -8,6 +8,8 @@ extern void restart();
 extern int get_ticks();
 extern void milli_delay(int milli_sec);
 extern void set_8253();
+extern void init_keyboard();
+extern void init_clock();
 
 void test1()
 {
@@ -37,14 +39,10 @@ void test3()
 
 void init()
 {
-	set_8253();
-	ticks=0;
+	init_clock();
 	printk("OS now\n");
-	delay(2);
 	p_proc_ready=proc_table;
 
-	set_irq_handler(CLOCK_IRQ,clock_handler);
-	enable_irq(CLOCK_IRQ);
 
 	proc_table[0].ticks=proc_table[0].priority=150;
 	proc_table[1].ticks=proc_table[1].priority=50;
@@ -54,6 +52,7 @@ void init()
 int _osmain(void)
 {
 	init();
+	init_keyboard();
 	restart(); //进入进程
 	while(1){}
 }

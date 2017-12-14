@@ -1,6 +1,7 @@
 %include "sconst.inc"
+jmp start
 
-
+ALIGN 4
 ; 导出函数
 global start
 global idt_flush

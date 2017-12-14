@@ -1,29 +1,24 @@
 OUTPUT_FORMAT("binary")
 ENTRY(start)
-	phys = 0x80000;
+	phys = 0x40000;
 	SECTIONS
 {
-
-	. = phys;
-
-	.text :
-	{
+	.text phys : AT(phys) {
+		code = .;
 		*(.text)
-			. = ALIGN(4096);
+			/*. = ALIGN(4096); */
 	}
-
-	.data :
-	{
+	.data : AT(phys + (data - code)) {
+		data = .;
 		*(.data)
 			*(.rodata)
-			. = ALIGN(4096);
+			/*. = ALIGN(4096); */
 	}
-
-	.bss : 
-	{
-
+	.bss : AT(phys + (bss - code)) {
+		bss = .;
 		*(.bss)
-			. = ALIGN(4096);
+			/*. = ALIGN(4096); */
 	}
 	end = .;
 }
+

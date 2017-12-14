@@ -5,6 +5,7 @@
 #include "const.h"
 
 #define CLOCK_IRQ 0
+#define KEYBOARD_IRQ 1
 #define INT_VECTOR_SYS_CALL 0x90
 
 extern int8_t k_reenter;
