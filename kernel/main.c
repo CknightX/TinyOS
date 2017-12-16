@@ -15,7 +15,7 @@ void test1()
 {
 	while(1)
 	{
-		printk("A.");
+		//printk("A.");
 		milli_delay(200);
 	}
 }
@@ -24,7 +24,7 @@ void test2()
 {
 	while(1)
 	{
-		printk("B.");
+		//printk("B.");
 		milli_delay(200);
 	}
 }
@@ -32,7 +32,7 @@ void test3()
 {
 	while(1)
 	{
-		printk("C.");
+		//printk("C.");
 		milli_delay(200);
 	}
 }

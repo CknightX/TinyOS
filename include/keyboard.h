@@ -1,5 +1,8 @@
-#ifndef _KEYBOARD_H
-#define _KEYBOARD_H
+
+
+#ifndef	_KEYBOARD_H_
+#define	_KEYBOARD_H_
+
 
 /************************************************************************/
 /*                          Macros Declaration                          */
@@ -22,6 +25,7 @@
 								   the value can be found either in the keymap column 0
 								   or in the list below */
 
+#define KB_DATA 0x60
 /* Special keys */
 #define ESC		(0x01 + FLAG_EXT)	/* Esc		*/
 #define TAB		(0x02 + FLAG_EXT)	/* Tab		*/
@@ -120,4 +124,6 @@ typedef struct s_kb {
 }KB_INPUT;
 
 
-#endif
+
+#endif 
+
