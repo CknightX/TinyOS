@@ -2,7 +2,7 @@
 #define _CONST_H
 
 
-#define NR_TASKS 4 //最大任务数
+//#define NR_TASKS 4 //最大任务数
 #define NR_IRQ   16 //主从 8259A管理的外部中断数
 #define NR_SYS_CALL 5
 #define INDEX_TSS 4

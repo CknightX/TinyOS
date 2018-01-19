@@ -4,6 +4,9 @@
 #include "const.h"
 #include "types.h"
 
+#define NR_TASKS 1 // 最大任务数
+#define NR_PROCS 3 // 最大用户进程数
+
 int ticks;
 
 typedef struct s_task

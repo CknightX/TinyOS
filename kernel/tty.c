@@ -17,4 +17,19 @@ void in_process(uint32_t key)
 		output[0]=key&0xff;
 		printk("%s",output);
 	}
+	else
+	{
+		int raw_code=key&MASK_RAW;
+		switch(raw_code)
+		{
+			case ENTER:
+				printk("\n");
+				break;
+			case BACKSPACE:
+				printk("\b \b");
+				break;
+			default:
+				break;
+		}
+	}
 }
