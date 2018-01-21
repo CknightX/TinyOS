@@ -133,9 +133,14 @@ save:
 	push fs
 	push gs
 
+	mov esi,edx
+
 	mov dx,ss
 	mov ds,dx
 	mov es,dx
+	mov fs,dx
+
+	mov edx,esi
 
 	mov esi,esp ; 进程表起始地址
 	inc byte [k_reenter]
@@ -308,12 +313,18 @@ restart_reenter:
 ; 系统调用中断
 sys_call:
 	call save
-	push dword [p_proc_ready] ; 哪一个进程引发的中断
+
 	sti
+	push esi
+
+	push dword [p_proc_ready] ; 哪一个进程引发的中断
+	push edx
 	push ecx
 	push ebx
 	call [sys_call_table+eax*4]
-	add esp,4*3
+	add esp,4*4
+
+	pop esi
 	mov [esi+EAXREG-P_STACKBASE],eax
 	cli
 	ret

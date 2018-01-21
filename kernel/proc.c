@@ -170,8 +170,75 @@ void schedule()
 	}
 }
 
-// 系统调用 - 系统级
+/*
+ * 实现IPC相关函数
+ */
+
+// 根据索引idx来得到p进程的IDT对应项的段基址
+int ldt_seg_linear(struct proc* p,int idx)
+{
+	struct Descriptor* d=&p->ldts[idx];
+	return d->base_high<<24 | d->base_mid<<16 | d->base_low;
+}
+
+// 虚拟地址转换成线性地址
+void* va2la(int pid,void* va)
+{
+	struct proc* p=&proc_table[pid];
+	uint32_t seg_base=ldt_seg_linear(p,INDEX_LDT_RW);
+	uint32_t la=seg_base+(uint32_t)va;
+
+	if (pid<NR_TASKS+NR_PROCS)
+	{
+		
+	}
+	return (void*)la;
+}
+
+// 将msg置0
+void reset_msg(MESSAGE* p)
+{
+	memset(p,0,sizeof(MESSAGE));
+}
+
+void block(struct proc* p)
+{
+	
+}
+
+/* 
+ * ------------------
+ * 系统调用 - 系统级
+ * ------------------
+ */
+
+// 获得时钟
 int sys_get_ticks()
 {
 	return ticks;
+}
+// IPC
+int sys_sendrec(int function,int src_dest,MESSAGE* m,struct proc* p)
+{
+	int ret=0;
+	int caller=proc2pid(p);
+	MESSAGE* mla=(MESSAGE*)va2la(caller,m);
+	mla->source=caller;
+
+	switch(function)
+	{
+		case SEND:
+			ret=msg_send(p,src_dest,m);
+			if (ret!=0)
+				return ret;
+			break;
+		case RECEIVE:
+			ret=msg_receive(p,src_dest,m);
+			if (ret!=0)
+				return ret;
+			break;
+		default:
+			break;
+	}
+	return 0;
 }
