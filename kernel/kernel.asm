@@ -305,10 +305,15 @@ restart_reenter:
 	iretd
 
 
+; 系统调用中断
 sys_call:
 	call save
+	push dword [p_proc_ready] ; 哪一个进程引发的中断
 	sti
+	push ecx
+	push ebx
 	call [sys_call_table+eax*4]
+	add esp,4*3
 	mov [esi+EAXREG-P_STACKBASE],eax
 	cli
 	ret

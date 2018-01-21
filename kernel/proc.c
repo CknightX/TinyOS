@@ -1,6 +1,7 @@
 #include "proc.h"
 #include "gdt.h"
 #include "string.h"
+#include "screen.h"
 extern Descriptor gdt[];
 void test1();
 void test2();
@@ -9,7 +10,7 @@ void task_tty();
 // 系统调用
 
 // 系统调用表
-system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks};
+system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks,sys_write};
 
 Process* p_proc_ready;
 Process proc_table[NR_TASKS+NR_PROCS];  //进程表
@@ -169,7 +170,7 @@ void schedule()
 	}
 }
 
-// 系统调用
+// 系统调用 - 系统级
 int sys_get_ticks()
 {
 	return ticks;

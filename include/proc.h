@@ -95,8 +95,12 @@ extern Process* p_proc_ready;
 extern TASK task_table[NR_TASKS];
 // 系统调用表
 extern system_call sys_call_table[];
-// 系统调用
+// 系统调用 - 系统级
 int sys_get_ticks();
+int sys_write(char* buf,int len,Process* p_proc);
+// 系统调用 - 用户级
+int get_ticks();
+void write(char* buf,int len);
 // 进程调度
 void schedule();
 #endif 

@@ -1,4 +1,5 @@
 #include "debug.h"
+#include "stdio.h"
 #include "string.h"
 #include "idt.h"
 #include "proc.h"
@@ -21,7 +22,7 @@ void test1()
 {
 	while(1)
 	{
-		//printk("A.");
+		printf("A.");
 		milli_delay(200);
 	}
 }
@@ -30,7 +31,7 @@ void test2()
 {
 	while(1)
 	{
-		//printk("B.");
+		printf("B.");
 		milli_delay(200);
 	}
 }
@@ -38,7 +39,7 @@ void test3()
 {
 	while(1)
 	{
-		//printk("C.");
+		printf("C.");
 		milli_delay(200);
 	}
 }

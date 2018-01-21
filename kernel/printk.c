@@ -20,7 +20,7 @@
 #include "string.h"
 #include "vargs.h"
 
-static int vsprintf(char *buff, const char *format, va_list args);
+int vsprintf(char *buff, const char *format, va_list args);
 
 void printk(const char *format, ...)
 {
@@ -163,7 +163,7 @@ static char *number(char *str, int num, int base, int size, int precision, int t
 	return str;
 }
 
-static int vsprintf(char *buff, const char *format, va_list args)
+int vsprintf(char *buff, const char *format, va_list args)
 {
 	int len;
 	int i;

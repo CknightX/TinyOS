@@ -1,6 +1,8 @@
 #include "types.h"
 #include "debug.h"
 #include "keyboard.h"
+#include "screen.h"
+#include "proc.h"
 extern void keyboard_read();
 
 void task_tty()
@@ -32,4 +34,16 @@ void in_process(uint32_t key)
 				break;
 		}
 	}
+}
+
+void tty_write(char* buf,int len)
+{
+	while(len--)
+		console_putc_color(*buf++,rc_black,rc_white);
+}
+
+int sys_write(char* buf, int len, Process* p_proc)
+{
+	tty_write(buf,len);
+	return 0;
 }
