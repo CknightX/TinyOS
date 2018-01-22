@@ -22,6 +22,7 @@ void test1()
 {
 	while(1)
 	{
+		assert(0);
 		printf("A.");
 		milli_delay(200);
 	}

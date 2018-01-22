@@ -3,12 +3,13 @@
 #ifndef	_ORANGES_PROTECT_H_
 #define	_ORANGES_PROTECT_H_
 #include "const.h"
+#include "types.h"
 
 #define CLOCK_IRQ 0
 #define KEYBOARD_IRQ 1
 #define INT_VECTOR_SYS_CALL 0x90
 
-extern int8_t k_reenter;
+int8_t k_reenter;
 
 void enable_irq (int irq);
 void disable_irq (int irq);
