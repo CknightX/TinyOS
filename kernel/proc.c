@@ -9,10 +9,11 @@ void test2();
 void test3();
 void task_tty();
 void task_sys();
+void sys_printx(const char* str);
 // 系统调用
 
 // 系统调用表
-system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks,sys_write,sys_sendrec};
+system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks,sys_write,sys_sendrec,sys_printx};
 
 Process* p_proc_ready;
 Process proc_table[NR_TASKS+NR_PROCS];  //进程表

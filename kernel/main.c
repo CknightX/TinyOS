@@ -35,8 +35,8 @@ void test1()
 {
 	while(1)
 	{
-	//	assert(0);
-		printf("A.");
+		assert(0);
+		printf("A.%d",_get_ticks());
 		milli_delay(200);
 	}
 }

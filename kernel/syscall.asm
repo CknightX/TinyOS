@@ -4,6 +4,7 @@
 _NR_get_ticks equ 0
 _NR_write equ 1
 _NR_sendrec equ 2
+_NR_printx equ 3
 
 ; 系统调用中断号
 INT_VECTOR_SYS_CALL equ 0x90
@@ -11,6 +12,7 @@ INT_VECTOR_SYS_CALL equ 0x90
 global get_ticks
 global write
 global sendrec
+global printx
 
 [BITS 32]
 [SECTION .text]
@@ -31,4 +33,8 @@ sendrec: ; IPC
 	mov edx,[esp+12] ; p_msg
 	int INT_VECTOR_SYS_CALL
 	ret
-	
+printx:
+	mov eax,_NR_printx
+	mov edx,[esp+4]
+	int INT_VECTOR_SYS_CALL
+	ret

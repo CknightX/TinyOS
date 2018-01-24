@@ -3,7 +3,9 @@
 #include "keyboard.h"
 #include "screen.h"
 #include "proc.h"
+#include "ipc.h"
 extern void keyboard_read();
+extern void disable_int();
 
 void task_tty()
 {
@@ -47,4 +49,33 @@ int sys_write(char* buf, int len, Process* p_proc)
 {
 	tty_write(buf,len);
 	return 0;
+}
+
+int sys_printx(int _unused1,int unused2,char* s,Process* p_proc)
+{
+	const char* p;
+	char reenter_err[]="? reenter is incorrect";
+	reenter_err[0]=MAGIC_PANIC;
+
+	if (k_reenter==0) // ring<1-3>
+		p=(const char*)va2la(proc2pid(p_proc),s);
+	else if (k_reenter>0) // ring<0>
+		p=s;
+	else
+		p=reenter_err;
+
+
+	if ((*p==MAGIC_PANIC)||
+			(*p==MAGIC_ASSERT && p_proc_ready<&proc_table[NR_TASKS])) // TASK
+	{
+		disable_int();
+		const char* q=p+1; // 跳过magic char
+		printk(q);
+		__asm__ __volatile__("hlt");
+	}
+	printk(p);
+
+
+	return 0;
+
 }

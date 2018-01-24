@@ -33,4 +33,5 @@ int send_recv(int function,int src_dest,MESSAGE* m);
 int sys_sendrec(int function,int src_dest,MESSAGE* m,struct proc* p);
 int msg_send(struct proc* current,int dest,MESSAGE* m);
 int msg_receive(struct proc* current,int src,MESSAGE* m);
+void* va2la(int pid,void* va);
 #endif
