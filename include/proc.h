@@ -3,9 +3,13 @@
 #include "gdt.h"
 #include "const.h"
 #include "types.h"
+#include "message.h"
+
 
 #define NR_TASKS 1 // 最大任务数
 #define NR_PROCS 3 // 最大用户进程数
+
+#define proc2pid(x) (x-proc_table)
 
 int ticks;
 
@@ -49,6 +53,18 @@ typedef struct proc
 
 	uint32_t pid; 				//进程的id
 	char p_name[16]; 			//进程名
+
+	int p_flags; // 进程的状态
+	MESSAGE* p_msg; // 消息
+	int p_recvfrom; // 进程阻塞在接收状态时，消息的来源
+	int p_sendto; // 进程阻塞在发送状态时，消息的去向
+
+	int has_int_msg;
+
+	struct proc* q_sending; // 消息队列
+	struct proc* next_sending;
+
+	int nr_tty;
 	
 
 }Process;

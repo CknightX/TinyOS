@@ -9,5 +9,7 @@ char *strcpy(char *dest, const char *src);
 char *strcat(char *dest, const char *src);
 int strlen(const char *src);
 
+#define phys_copy memcpy
+
 #endif
 

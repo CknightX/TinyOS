@@ -1,11 +1,14 @@
-#include "ipc.h"
+#include "gdt.h"
 #include "debug.h"
 #include "proc.h"
+#include "ipc.h"
+#include "protect.h"
+#include "string.h"
 
 // 根据索引idx来得到p进程的IDT对应项的段基址
 int ldt_seg_linear(struct proc* p,int idx)
 {
-	struct Descriptor* d=&p->ldts[idx];
+	Descriptor* d=&p->ldts[idx];
 	return d->base_high<<24 | d->base_mid<<16 | d->base_low;
 }
 
@@ -83,6 +86,7 @@ int deadlock(int src,int dest)
 		if (p->p_flags & SENDING) // 目标进程在发送状态
 		{
 			if (p->p_sendto==src) // 且目标是源
+			{}
 		}
 	}
 }
@@ -98,9 +102,9 @@ int msg_send(struct proc* current,int dest,MESSAGE* m)
 	if (deadlock(proc2pid(sender),dest)) // 死锁判断
 		panic("DEADLOCK");
 
-	if ((receiver->p_flags & RECEIVING)&& // 接收方处于接收信息的状态
-			receiver->p_recvfrom==proc2pid(sender)||
-			receiver->p_recvfrom==ANY)
+	if ((receiver->p_flags & RECEIVING)&&
+			(receiver->p_recvfrom==proc2pid(sender)||
+			receiver->p_recvfrom==ANY))
 	{
 		assert(receiver->p_msg); // 消息体不为NULL
 		assert(m);
@@ -111,7 +115,7 @@ int msg_send(struct proc* current,int dest,MESSAGE* m)
 
 		receiver->p_msg=0;
 		receiver->p_flags&=~RECEIVING;
-		p_dest->p_recvfrom=NO_TASK;
+		receiver->p_recvfrom=NO_TASK;
 		unblock(receiver);
 
 		assert(receiver->p_flags==0);
@@ -168,13 +172,13 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 			((src==ANY)||(src==INTERRUPT)))
 	{
 		MESSAGE msg;
-		reset_msg(msg);
+		reset_msg(&msg);
 		msg.source=INTERRUPT;
 		msg.type=HARD_INT;
 
 		assert(m);
 
-		phys_copy(va2la(proc2pid(receiver),m),&msg,sizeof(MESSAGE));
+		phys_copy((void*)va2la(proc2pid(receiver),m),(void*)&msg,sizeof(MESSAGE));
 		
 		receiver->has_int_msg=0;
 		assert(receiver->p_flags==0);
@@ -228,7 +232,7 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 			}
 			
 			assert(receiver->p_flags==0);
-			assert(receiver->msg==0);
+			assert(receiver->p_msg==0);
 			assert(receiver->p_recvfrom==NO_TASK);
 			assert(receiver->p_sendto==NO_TASK);
 			assert(receiver->q_sending!=0);
@@ -264,7 +268,7 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 				sizeof(MESSAGE));
 
 		p_from->p_msg=0;
-		p_from->sendto=NO_TASK;
+		p_from->p_sendto=NO_TASK;
 		p_from->p_flags &= ~SENDING;
 		unblock(p_from);
 	}
@@ -285,4 +289,5 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 		assert(receiver->p_sendto==NO_TASK);
 		assert(receiver->has_int_msg==0);
 	}
+	return 0;
 }
