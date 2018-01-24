@@ -23,7 +23,7 @@ void* va2la(int pid,void* va)
 
 	if (pid<NR_TASKS+NR_PROCS)
 	{
-		
+		assert(la==(uint32_t)va);
 	}
 	return (void*)la;
 }

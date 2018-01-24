@@ -2,6 +2,7 @@
 #include "gdt.h"
 #include "string.h"
 #include "screen.h"
+#include "ipc.h"
 extern Descriptor gdt[];
 void test1();
 void test2();
@@ -11,7 +12,7 @@ void task_sys();
 // 系统调用
 
 // 系统调用表
-system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks,sys_write};
+system_call sys_call_table[NR_SYS_CALL]={sys_get_ticks,sys_write,sys_sendrec};
 
 Process* p_proc_ready;
 Process proc_table[NR_TASKS+NR_PROCS];  //进程表
@@ -71,6 +72,8 @@ void init_proc_table()
 	uint8_t rpl;
 	uint16_t eflags;
 
+	int prio; //优先级
+
 	for (int i=0;i<NR_PROCS+NR_TASKS;++i)
 	{
 		// 任务(内核态)
@@ -80,6 +83,7 @@ void init_proc_table()
 			privilege=PRIVILEGE_TASK;
 			rpl=RPL_TASK;
 			eflags=0x1202;  // IF=0,IOPL=1
+			prio=15;
 		}
 		// 用户进程(用户态)
 		else
@@ -88,6 +92,7 @@ void init_proc_table()
 			privilege=PRIVILEGE_USER;
 			rpl=RPL_USER;
 			eflags=0x202;   //IOPL=0 禁止用户进程的IO权限
+			prio=5;
 
 		}
 
@@ -112,9 +117,21 @@ void init_proc_table()
 		p_proc->regs.esp=(uint32_t)p_task_stack;
 		p_proc->regs.eflags=eflags; 
 
+		// 初始化ipc相关
+		p_proc->nr_tty		= 0;
+
+		p_proc->p_flags = 0;
+		p_proc->p_msg = 0;
+		p_proc->p_recvfrom = NO_TASK;
+		p_proc->p_sendto = NO_TASK;
+		p_proc->has_int_msg = 0;
+		p_proc->q_sending = 0;
+		p_proc->next_sending = 0;
+
+		p_proc->ticks = p_proc->priority = prio;
+
 		p_task_stack-=p_task->stacksize;
 		p_proc++;
-		p_task++;
 		selector_ldt += 1<<3;
 	}
 }
@@ -145,6 +162,10 @@ void init_proc()
 	}
 
 	init_proc_table();
+
+	k_reenter=0;
+	ticks=0;
+
 
 }
 

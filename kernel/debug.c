@@ -12,7 +12,7 @@ void assertion_failure(char* exp,char* file,char* base_file,int line)
 	{
 		while(1){}
 	}
-	else if (k_reenter>-1) // ring0
+	else if (k_reenter!=-1) // ring0
 	{
 		__asm__ __volatile__("hlt");
 		while(1){}

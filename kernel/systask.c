@@ -1,6 +1,7 @@
 #include "message.h"
 #include "types.h"
 #include "debug.h"
+#include "stdio.h"
 #include "ipc.h"
 
 void task_sys()

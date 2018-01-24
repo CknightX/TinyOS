@@ -157,7 +157,7 @@ save:
 
 ALIGN   16
 hwint00:                ; Interrupt routine for irq 0 (the clock).
-	hwint_master 0
+		hwint_master 	0
 	
 ALIGN   16
 hwint01:                ; Interrupt routine for irq 1 (keyboard)

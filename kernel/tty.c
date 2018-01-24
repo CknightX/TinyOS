@@ -7,6 +7,7 @@ extern void keyboard_read();
 
 void task_tty()
 {
+	assert(0);
 	while(1)
 		keyboard_read();
 }

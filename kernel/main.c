@@ -3,6 +3,8 @@
 #include "string.h"
 #include "idt.h"
 #include "proc.h"
+#include "ipc.h"
+#include "const.h"
 
 extern void clock_handler();
 extern void restart();
@@ -17,6 +19,17 @@ extern uint8_t kernel_start[];
 extern uint8_t kernel_end[];
 extern uint8_t code[];
 extern uint8_t data[];
+
+#define TASK_SYS 1
+
+int _get_ticks()
+{
+	MESSAGE msg;
+	reset_msg(&msg);
+	msg.type=GET_TICKS;
+	send_recv(BOTH,TASK_SYS,&msg);
+	return msg.RETVAL;
+}
 
 void test1()
 {
@@ -45,6 +58,7 @@ void test3()
 	}
 }
 
+
 void init()
 {
 	init_clock();
@@ -56,10 +70,14 @@ void init()
 	printk("kernel used:   %d KB\n\n",(kernel_end-kernel_start+1023)/1024);
 	p_proc_ready=proc_table;
 
+	/*
 
 	proc_table[0].ticks=proc_table[0].priority=150;
-	proc_table[1].ticks=proc_table[1].priority=50;
+	proc_table[1].ticks=proc_table[1].priority=150;
 	proc_table[2].ticks=proc_table[2].priority=30;
+	proc_table[3].ticks=proc_table[3].priority=20;
+	proc_table[4].ticks=proc_table[4].priority=20;
+	*/
 }
 
 int _osmain(void)

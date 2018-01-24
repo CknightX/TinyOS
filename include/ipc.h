@@ -28,6 +28,7 @@ enum msgtype
 };
 
 
+void reset_msg(MESSAGE* p);
 int send_recv(int function,int src_dest,MESSAGE* m);
 int sys_sendrec(int function,int src_dest,MESSAGE* m,struct proc* p);
 int msg_send(struct proc* current,int dest,MESSAGE* m);
