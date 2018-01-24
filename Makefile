@@ -12,7 +12,7 @@ TARGET = bin/boot.bin bin/loader.bin bin/kernel.bin
 OBJS = kernel/kernel.o kernel/main.o kernel/screen.o kernel/common.o kernel/string.o\
 	   kernel/printk.o kernel/gdt.o kernel/idt.o kernel/proc.o kernel/clock.o kernel/utils.o\
 	   kernel/syscall.o kernel/keyboard.o kernel/tty.o kernel/printf.o kernel/debug.o\
-	   kernel/ipc.o
+	   kernel/ipc.o kernel/systask.o
 
 LD_FLAGS = -T script/link.ld -nostdlib
 
@@ -95,6 +95,8 @@ kernel/debug.o : kernel/debug.c
 	$(CC) $< -o $@ $(CFLAGS)
 
 kernel/ipc.o : kernel/ipc.c
+	$(CC) $< -o $@ $(CFLAGS)
+kernel/systask.o : kernel/systask.c
 	$(CC) $< -o $@ $(CFLAGS)
 
 debug : 

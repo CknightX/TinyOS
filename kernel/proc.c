@@ -7,6 +7,7 @@ void test1();
 void test2();
 void test3();
 void task_tty();
+void task_sys();
 // 系统调用
 
 // 系统调用表
@@ -20,6 +21,7 @@ char task_stack[STACK_SIZE_TOTAL];
 // 任务表
 TASK task_table[NR_TASKS]={
 	{task_tty,STACK_SIZE_TTY,"TTY"},
+	{task_sys,STACK_SIZE_SYS,"SYS"},
 };
 
 TASK user_proc_table[NR_PROCS]={
@@ -156,16 +158,18 @@ void schedule()
 	{
 		for (p=proc_table;p<proc_table+NR_TASKS+NR_PROCS;++p)
 		{
-			if (p->ticks>greatest_ticks)
-			{
-				greatest_ticks=p->ticks;
-				p_proc_ready=p;
-			}
+			if (p->p_flags==0)
+				if (p->ticks>greatest_ticks)
+				{
+					greatest_ticks=p->ticks;
+					p_proc_ready=p;
+				}
 		}
 		if (!greatest_ticks)
 		{
 			for (p=proc_table;p<proc_table+NR_TASKS+NR_PROCS;++p)
-				p->ticks=p->priority;
+				if (p->p_flags==0)
+					p->ticks=p->priority;
 		}
 	}
 }

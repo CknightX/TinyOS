@@ -1,5 +1,6 @@
 #ifndef _MESSAGE_H
 #define _MESSAGE_H
+#include "types.h"
 typedef struct _msg1
 {
 	int imsg1;
@@ -40,4 +41,6 @@ typedef struct _MESSAGE
 		msg3 m3;
 	}u;
 } MESSAGE;
+
+#define RETVAL u.m3.imsg1
 #endif

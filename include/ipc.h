@@ -4,6 +4,7 @@
 #include "message.h"
 #include "ipc.h"
 #include "const.h"
+#include "proc.h"
 
 // status
 #define SENDING 0x02
@@ -14,10 +15,11 @@
 #define RECEIVE 2
 #define BOTH 3
 
-#define ANY		(NR_TASKS + NR_PROCS + 10)
-#define NO_TASK		(NR_TASKS + NR_PROCS + 20)
+
 
 #define INTERRUPT -10
+
+extern int sendrec(int function,int src_dest,MESSAGE* m);
 
 enum msgtype
 {
@@ -26,7 +28,7 @@ enum msgtype
 };
 
 
-
+int send_recv(int function,int src_dest,MESSAGE* m);
 int sys_sendrec(int function,int src_dest,MESSAGE* m,struct proc* p);
 int msg_send(struct proc* current,int dest,MESSAGE* m);
 int msg_receive(struct proc* current,int src,MESSAGE* m);

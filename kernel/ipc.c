@@ -5,6 +5,8 @@
 #include "protect.h"
 #include "string.h"
 
+int sendrec(int function,int src_dest,MESSAGE* m);
+
 // 根据索引idx来得到p进程的IDT对应项的段基址
 int ldt_seg_linear(struct proc* p,int idx)
 {
@@ -33,7 +35,7 @@ void reset_msg(MESSAGE* p)
 }
 
 
-// 收发信息
+// 收发信息(内核态)
 int sys_sendrec(int function,int src_dest,MESSAGE* m,struct proc* p)
 {
 	assert(k_reenter==0); // 不处于ring0
@@ -65,6 +67,33 @@ int sys_sendrec(int function,int src_dest,MESSAGE* m,struct proc* p)
 	}
 	return 0;
 }
+
+// 收发消息(用户态)
+int send_recv(int function,int src_dest,MESSAGE* msg)
+{
+	int ret=0;
+	if (function==RECEIVE)
+		memset(msg,0,sizeof(MESSAGE));
+	switch(function)
+	{
+		case BOTH:
+			ret=sendrec(SEND,src_dest,msg);
+			if (ret==0)
+				ret=sendrec(RECEIVE,src_dest,msg);
+			break;
+		case SEND:
+		case RECEIVE:
+			ret=sendrec(function,src_dest,msg);
+			break;
+		default:
+			assert((function==BOTH)||(function==SEND)||(function==RECEIVE));
+			break;
+	}
+
+	return ret;
+
+}
+
 // 阻塞一个进程
 void block(struct proc* p)
 {

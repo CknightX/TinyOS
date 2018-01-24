@@ -6,7 +6,7 @@
 #include "message.h"
 
 
-#define NR_TASKS 1 // 最大任务数
+#define NR_TASKS 2 // 最大任务数
 #define NR_PROCS 3 // 最大用户进程数
 
 #define proc2pid(x) (x-proc_table)

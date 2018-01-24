@@ -10,7 +10,9 @@
 #define STACK_SIZE_TESTB	0x8000
 #define STACK_SIZE_TESTC	0x8000
 #define STACK_SIZE_TTY		0x8000
+#define STACK_SIZE_SYS		0x8000
 #define STACK_SIZE_TOTAL	(STACK_SIZE_TTY+\
+		STACK_SIZE_SYS+\
 		STACK_SIZE_TESTA+\
 		STACK_SIZE_TESTB+\
 		STACK_SIZE_TESTC)
@@ -133,5 +135,7 @@
 #define TIMER_FREQ     1193182L/* clock frequency for timer in PC and AT */
 #define HZ             100  /* clock freq (software settable on IBM-PC) */
 
+#define ANY		(NR_TASKS + NR_PROCS + 10)
+#define NO_TASK		(NR_TASKS + NR_PROCS + 20)
 
 #endif
