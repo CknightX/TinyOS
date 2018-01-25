@@ -1,6 +1,6 @@
 OUTPUT_FORMAT("binary")
 ENTRY(start)
-	phys = 0x40000;
+	phys = 0x10000;
 	SECTIONS
 {
 	. = phys;
@@ -10,10 +10,12 @@ ENTRY(start)
 		*(.text)
 			/*. = ALIGN(4096); */
 	}
+	.rodata : {
+		*(.rodata)
+	}
 	.data : {
 		data = .;
 		*(.data)
-			*(.rodata)
 			/*. = ALIGN(4096); */
 	}
 	.bss : {
