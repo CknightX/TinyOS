@@ -3,7 +3,7 @@
 #include "debug.h"
 #include "stdio.h"
 #include "ipc.h"
-
+void printx(char* str);
 void task_sys()
 {
 	MESSAGE msg;
@@ -15,6 +15,7 @@ void task_sys()
 		switch(msg.type)
 		{
 			case GET_TICKS:
+				log("Someone want to get ticks.");
 				msg.RETVAL=ticks;
 				send_recv(SEND,src,&msg);
 				break;

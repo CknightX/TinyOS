@@ -4,12 +4,14 @@
 #include "screen.h"
 #include "proc.h"
 #include "ipc.h"
+#include "stdio.h"
+extern void printx(const char* str);
 extern void keyboard_read();
 extern void disable_int();
+extern void task_sys();
 
 void task_tty()
 {
-	assert(0);
 	while(1)
 		keyboard_read();
 }
@@ -58,9 +60,15 @@ int sys_printx(int _unused1,int unused2,char* s,Process* p_proc)
 	reenter_err[0]=MAGIC_PANIC;
 
 	if (k_reenter==0) // ring<1-3>
+	{
 		p=(const char*)va2la(proc2pid(p_proc),s);
+		printk("\n[ring<1-3>]\n");
+	}
 	else if (k_reenter>0) // ring<0>
+	{
 		p=s;
+		printk("\n[ring<0>]\n");
+	}
 	else
 		p=reenter_err;
 

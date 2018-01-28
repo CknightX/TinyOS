@@ -3,12 +3,13 @@
 #include "string.h"
 #include "screen.h"
 #include "ipc.h"
+#include "debug.h"
 extern Descriptor gdt[];
 void test1();
 void test2();
 void test3();
-void task_tty();
-void task_sys();
+extern void task_tty();
+extern void task_sys();
 void sys_printx(const char* str);
 // 系统调用
 
@@ -181,11 +182,13 @@ void schedule()
 		for (p=proc_table;p<proc_table+NR_TASKS+NR_PROCS;++p)
 		{
 			if (p->p_flags==0)
+			{
 				if (p->ticks>greatest_ticks)
 				{
 					greatest_ticks=p->ticks;
 					p_proc_ready=p;
 				}
+			}
 		}
 		if (!greatest_ticks)
 		{

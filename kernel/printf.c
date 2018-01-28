@@ -8,7 +8,7 @@ void write(const char* str,int len);
 int printf(const char *format, ...)
 {
 	// 避免频繁创建临时变量，内核的栈很宝贵
-	static char buff[1024];
+	static char buff[4096];
 	va_list args;
 	int i;
 

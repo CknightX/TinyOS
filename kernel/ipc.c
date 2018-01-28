@@ -4,6 +4,7 @@
 #include "ipc.h"
 #include "protect.h"
 #include "string.h"
+#include "stdio.h"
 
 int sendrec(int function,int src_dest,MESSAGE* m);
 
@@ -20,6 +21,7 @@ void* va2la(int pid,void* va)
 	struct proc* p=&proc_table[pid];
 	uint32_t seg_base=ldt_seg_linear(p,INDEX_LDT_RW);
 	uint32_t la=seg_base+(uint32_t)va;
+//	printf("\npid=%d, la=%d\n",pid,(uint32_t)la);
 
 	if (pid<NR_TASKS+NR_PROCS)
 	{
@@ -123,18 +125,20 @@ int deadlock(int src,int dest)
 // 发送消息
 int msg_send(struct proc* current,int dest,MESSAGE* m)
 {
+	log("I want to send now.");
 	struct proc* sender=current;
 	struct proc* receiver=proc_table+dest;
 
 	assert(proc2pid(sender)!=dest); // 禁止自己给自己发消息
 
-	if (deadlock(proc2pid(sender),dest)) // 死锁判断
-		panic("DEADLOCK");
+//	if (deadlock(proc2pid(sender),dest)) // 死锁判断
+//		panic("DEADLOCK");
 
 	if ((receiver->p_flags & RECEIVING)&&
 			(receiver->p_recvfrom==proc2pid(sender)||
 			receiver->p_recvfrom==ANY))
 	{
+		log("Receiver can receive now.");
 		assert(receiver->p_msg); // 消息体不为NULL
 		assert(m);
 
@@ -146,6 +150,7 @@ int msg_send(struct proc* current,int dest,MESSAGE* m)
 		receiver->p_flags&=~RECEIVING;
 		receiver->p_recvfrom=NO_TASK;
 		unblock(receiver);
+		log("Unlock receiver.");
 
 		assert(receiver->p_flags==0);
 		assert(receiver->p_msg==0);
@@ -160,6 +165,7 @@ int msg_send(struct proc* current,int dest,MESSAGE* m)
 	}
 	else // 目标进程不处于接收消息的状态
 	{
+		log("Receiver can't receive now.");
 		sender->p_flags|=SENDING;
 		sender->p_sendto=dest;
 		sender->p_msg=m;
@@ -222,6 +228,7 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 	{
 		if (receiver->q_sending)
 		{
+			log("Get message from ANY");
 			p_from=receiver->q_sending; // 从队列中取出第一个
 			copyok=1;
 
@@ -303,10 +310,14 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 	}
 	else // 没有消息
 	{
+		log("SYSTASK is in RECEVING now.");
 		receiver->p_flags|=RECEIVING;
 		receiver->p_msg=m;
 		if (src==ANY)
+		{
+			log("SYSTASK can receive from ANY.");
 			receiver->p_recvfrom=ANY;
+		}
 		else
 			receiver->p_recvfrom=proc2pid(p_from);
 

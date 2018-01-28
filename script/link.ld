@@ -8,10 +8,8 @@ ENTRY(start)
 	.text : {
 		code = .;
 		*(.text)
-			/*. = ALIGN(4096); */
-	}
-	.rodata : {
 		*(.rodata)
+			/*. = ALIGN(4096); */
 	}
 	.data : {
 		data = .;

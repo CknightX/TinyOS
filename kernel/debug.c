@@ -33,8 +33,7 @@ void spin(const char* msg)
 	printl("\nspinning in %s ...\n",msg);
 	while(1);
 }
-void panic(const char* fmt)
+void panic(char* msg)
 {
-	printl(fmt);
-	printl("%c    panic!!!",MAGIC_PANIC);
+	printl("%c%s panic!!!",MAGIC_PANIC,msg);
 }
