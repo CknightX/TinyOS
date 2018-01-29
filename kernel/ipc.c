@@ -108,7 +108,7 @@ void unblock(struct proc* p)
 	assert(p->p_flags==0);
 }
 
-// 判断消息发送有没有形成死锁,即A->B->C->A
+// 判断消息发送是否存在死锁
 int deadlock(int src,int dest)
 {
 	struct proc* p=proc_table+dest;
@@ -116,10 +116,25 @@ int deadlock(int src,int dest)
 	{
 		if (p->p_flags & SENDING) // 目标进程在发送状态
 		{
-			if (p->p_sendto==src) // 且目标是源
-			{}
+			if (p->p_sendto==src) // 且目标是源,A -> B -> A
+			{
+				p=proc_table+dest;
+				printf(">_< %s",p->p_name);
+				do
+				{
+					assert(p->p_msg);
+					p=proc_table+p->p_sendto;
+					printf("->%s",p->p_name);
+				}
+				while(p!=proc_table+src);
+				return 1;
+			}
+			p=proc_table+p->p_sendto;
 		}
+		else
+			break;
 	}
+	return 0;
 }
 
 // 发送消息
@@ -131,12 +146,12 @@ int msg_send(struct proc* current,int dest,MESSAGE* m)
 
 	assert(proc2pid(sender)!=dest); // 禁止自己给自己发消息
 
-//	if (deadlock(proc2pid(sender),dest)) // 死锁判断
-//		panic("DEADLOCK");
+	if (deadlock(proc2pid(sender),dest)) // 死锁判断
+		panic("DEADLOCK");
 
 	if ((receiver->p_flags & RECEIVING)&&
 			(receiver->p_recvfrom==proc2pid(sender)||
-			receiver->p_recvfrom==ANY))
+			 receiver->p_recvfrom==ANY))
 	{
 		log("Receiver can receive now.");
 		assert(receiver->p_msg); // 消息体不为NULL
@@ -214,7 +229,7 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 		assert(m);
 
 		phys_copy((void*)va2la(proc2pid(receiver),m),(void*)&msg,sizeof(MESSAGE));
-		
+
 		receiver->has_int_msg=0;
 		assert(receiver->p_flags==0);
 		assert(receiver->p_msg==0);
@@ -223,7 +238,7 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 
 		return 0;
 	}
-	
+
 	if (src==ANY) // 消息来源任意
 	{
 		if (receiver->q_sending)
@@ -266,7 +281,7 @@ int msg_receive(struct proc* current,int src,MESSAGE* m)
 				prev=p;
 				p=p->next_sending;
 			}
-			
+
 			assert(receiver->p_flags==0);
 			assert(receiver->p_msg==0);
 			assert(receiver->p_recvfrom==NO_TASK);
