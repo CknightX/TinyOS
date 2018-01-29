@@ -68,13 +68,13 @@ READ_KERNEL:
 	mov bx,0
 	mov ax,BaseOfKernelFile
 	mov es,ax      ; 从磁盘将数据读入es:bx指向的缓冲区中
-	mov ch,1 ; 柱面为0
-	mov dh,0 ; 磁头为1
-	mov cl,2 ; 起始扇区号为17
+	mov ch,1 ; 柱面为1
+	mov dh,0 ; 磁头为0
+	mov cl,2 ; 起始扇区号为2
 
 READ_SECTOR:
 mov ah,0x02 ; 读取模式
-mov al,38 ; 读35个扇区
+mov al,50 ; 读50个扇区
 mov dl,0x00 ; A盘
 int 0x13
 
