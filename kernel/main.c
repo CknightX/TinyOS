@@ -57,6 +57,16 @@ void test3()
 	}
 }
 
+void task_fs()
+{
+	printf("FS begin.\n");
+	MESSAGE driver_msg;
+	driver_msg.type=DEV_OPEN;
+	send_recv(BOTH,TASK_HD,&driver_msg);
+
+	spin("FS");
+}
+
 
 void init()
 {
