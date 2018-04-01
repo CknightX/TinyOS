@@ -8,7 +8,7 @@
 void task_hd()
 {
 	MESSAGE msg;
-	init_hd(); // 初始化硬盘
+	init_hd(); // 初始化硬盘 
 	while(1)
 	{
 		send_recv(RECEIVE,ANY,&msg);
