@@ -5,6 +5,8 @@
 											  ((drv)<<4) | \
 								`			  (lba_highest & 0xf) | 0xa0)
 
+#define DEV_OPEN
+
 void task_hd();
 void init_hd();
 void hd_identify();

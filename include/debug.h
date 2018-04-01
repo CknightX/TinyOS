@@ -2,6 +2,7 @@
 #define _DEBUG_H
 #include "screen.h"
 #include "stdio.h"
+void printl(const char* fmt,...);
 
 #define DEBUG
 #ifdef DEBUG

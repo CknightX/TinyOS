@@ -19,7 +19,7 @@ void task_hd()
 				hd_identify(0);
 				break;
 			default:
-				dump_msg("HD driver: unknown msg",&msg);
+	//			dump_msg("HD driver: unknown msg",&msg);
 				spin("FS main_loop (invalid msg.type)");
 				break;
 		}
@@ -33,7 +33,7 @@ void init_hd()
 	uint8_t* pNrDrives=(uint8_t*)(0x475); // 获取系统内硬盘数量
 	printl("NrDrives: %d.\n",*pNrDrives);
 	assert(*pNrDrives);
-	put_irq_handler(AT_WINI_IRQ,hd_handler); // 指定中断处理程序
+	set_irq_handler(AT_WINI_IRQ,hd_handler); // 指定中断处理程序
 	enable_irq(CASCADE_IRQ); 
 	enable_irq(AT_WINI_IRQ);
 }

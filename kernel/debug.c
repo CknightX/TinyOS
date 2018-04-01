@@ -5,7 +5,6 @@
 int8_t k_reenter; 
 extern void printx(const char* msg);
 int vsprintf(char *buff, const char *format, va_list args);
-void printl(const char* fmt,...);
 
 void assertion_failure(char* exp,char* file,char* base_file,int line)
 {
