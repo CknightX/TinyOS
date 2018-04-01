@@ -6,8 +6,6 @@
 #include "idt.h"
 
 
-
-
 // syscall.asm
 extern int get_ticks();
 

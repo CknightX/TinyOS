@@ -1,7 +1,7 @@
 
 
-#ifndef	_ORANGES_PROTECT_H_
-#define	_ORANGES_PROTECT_H_
+#ifndef	_IDT_H
+#define	_IDT_H
 #include "const.h"
 #include "types.h"
 
