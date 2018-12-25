@@ -8,12 +8,12 @@ ENTRY(start)
 	.text : {
 		code = .;
 		*(.text)
-		*(.rodata)
 			/*. = ALIGN(4096); */
 	}
 	.data : {
 		data = .;
 		*(.data)
+		*(.rodata)
 			/*. = ALIGN(4096); */
 	}
 	.bss : {

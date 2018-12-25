@@ -19,8 +19,11 @@ LD_FLAGS = -T script/link.ld -nostdlib
 
 all : clean buildimage
 
-run : 
+bochs : 
 	$(VM) -f ./config/bochsrc
+run :
+	qemu -fda a.img -boot a 
+	
 
 disp_data : 
 	xxd -u -a -g 1 -c 16 -s +0x4200 -l 0x11 a.img
