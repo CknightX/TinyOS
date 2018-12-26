@@ -5,6 +5,7 @@
 #include "proc.h"
 #include "ipc.h"
 #include "const.h"
+#include "pmm.h"
 
 extern void clock_handler();
 extern void restart();
@@ -56,7 +57,7 @@ void test3()
 		milli_delay(200);
 	}
 }
-
+extern void test();
 
 void init()
 {
@@ -69,6 +70,9 @@ void init()
 	printk("kernel used:   %d KB\n\n",(kernel_end-kernel_start+1023)/1024);
 	p_proc_ready=proc_table;
 
+	printk("-----------------------------------\n");
+	show_mmap();
+	printk("-----------------------------------\n");
 	/*
 
 	proc_table[0].ticks=proc_table[0].priority=150;

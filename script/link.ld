@@ -5,23 +5,24 @@ ENTRY(start)
 {
 	. = phys;
 	PROVIDE( kernel_start = . );
-	.text : {
+	.text : AT(phys) {
 		code = .;
 		*(.text)
-			/*. = ALIGN(4096); */
+		. = ALIGN(4096); 
 	}
-	.data : {
+	.data : AT(phys + (data - code)){
 		data = .;
 		*(.data)
 		*(.rodata)
-			/*. = ALIGN(4096); */
+		. = ALIGN(4096); 
 	}
-	.bss : {
+	.bss : AT(phys + (bss - code)){
 		bss = .;
 		*(.bss)
-			/*. = ALIGN(4096); */
+		. = ALIGN(4096); 
 	}
 
 	PROVIDE( kernel_end = . );
+
 }
 

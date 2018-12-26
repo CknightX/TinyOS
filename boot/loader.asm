@@ -1,5 +1,29 @@
 org 0100h
 
+; 获取物理内存信息
+ADRS equ 0x500
+MCR_COUNT equ 0x400
+GET_MEM_MAP:
+	mov dword [MCR_COUNT],0
+	mov ax,0
+	mov es,ax
+	xor ebx,ebx
+	mov di,ADRS
+GET_MEM_LOOP:
+	mov eax,0xe820  
+	mov ecx,20
+	mov edx,0x534d4150
+	int 0x15
+	jc GET_MEM_FAIL
+	add di,20
+	inc dword [MCR_COUNT]
+	cmp ebx,0
+	jne GET_MEM_LOOP
+	jmp GET_MEM_OK
+
+GET_MEM_FAIL:
+ hlt
+
 ; TODO 加载GDT 进入保护模式
 jmp LABEL_BEGIN
 
@@ -36,6 +60,10 @@ PageTblBase equ 101000h
 ; 16位代码段
 [BITS 16] 
 [SECTION .s16]
+
+GET_MEM_OK:
+
+; 进入保护模式
 
 LABEL_BEGIN:
 	mov ax,cs
@@ -74,7 +102,7 @@ READ_KERNEL:
 
 READ_SECTOR:
 mov ah,0x02 ; 读取模式
-mov al,38 ; 读35个扇区
+mov al,60 ; 读35个扇区
 mov dl,0x00 ; A盘
 int 0x13
 
@@ -103,7 +131,7 @@ LABEL_SEG_CODE32:
 
 	call PRINT_PM
 
-	call SetupPageing
+	call SetupPageing ;启动分页
 	call PRINT_PAGE
 
 	; 跳转到内核
