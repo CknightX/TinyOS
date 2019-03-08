@@ -3,7 +3,7 @@ CC = gcc -I include/
 VM = bochs
 LD = ld
 
-CFLAGS = -Wall -Werror -nostdinc -fno-builtin -fno-stack-protector -funsigned-char \
+CFLAGS = -Wall -Werror -nostdinc -fno-builtin -fno-stack-protector -funsigned-char -fno-pic \
 		 		 -finline-functions -finline-small-functions -findirect-inlining \
 				 		 -finline-functions-called-once -m32 -g -c
 
@@ -33,11 +33,13 @@ disp_root :
 
 buildimage : $(TARGET)
 	bximage a.img -fd -size=1.44 -q
-	dd if=bin/boot.bin of=a.img bs=512 count=1 conv=notrunc
-	sudo mount -o loop a.img /mnt/floppy
+	sudo dd if=bin/boot.bin of=a.img bs=512 count=1 conv=notrunc
+	mv a.img ~/
+	sudo mount -o loop ~/a.img /mnt/floppy
 	sudo cp bin/loader.bin /mnt/floppy/ -v
 	sudo cp bin/kernel.bin /mnt/floppy/ -v
 	sudo umount /mnt/floppy
+	mv ~/a.img ./
 
 bin/kernel.bin : $(OBJS)
 	$(LD) $(OBJS) -o $@ $(LD_FLAGS)
